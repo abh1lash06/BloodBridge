@@ -39,11 +39,14 @@ public class SecurityConfig {
     /**
      * CORS configuration
      *
-     * Frontend:
+     * Local frontend:
      * http://localhost:3000
      *
+     * Production frontend:
+     * https://blood-bridge-delta-six.vercel.app
+     *
      * Backend:
-     * http://localhost:8080
+     * Railway production server
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -51,7 +54,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:3000")
+                List.of(
+                        "http://localhost:3000",
+                        "https://blood-bridge-delta-six.vercel.app"
+                )
         );
 
         configuration.setAllowedMethods(
@@ -93,7 +99,7 @@ public class SecurityConfig {
                 // CSRF disabled because this is a stateless JWT API
                 .csrf(csrf -> csrf.disable())
 
-                // Enable CORS for the React frontend
+                // Enable CORS for local and production React frontends
                 .cors(cors ->
                         cors.configurationSource(
                                 corsConfigurationSource()

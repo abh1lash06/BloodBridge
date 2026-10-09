@@ -1,94 +1,69 @@
 import apiClient from './client';
-import { toInternalBloodGroup } from '@/lib/utils';
-function normalizeBloodRequests(data) {
-    if (Array.isArray(data)) {
-        return data;
+
+async function getAllPages(url, params = {}) {
+    const results = [];
+    let page = 0;
+    while (page < 100) {
+        const response = await apiClient.get(url, { params: { ...params, page, size: 50 } });
+        const data = response.data;
+        if (Array.isArray(data)) return data;
+        if (!data || !Array.isArray(data.content)) return results;
+        results.push(...data.content);
+        if (data.last === true || data.content.length === 0 ||
+            (typeof data.totalPages === 'number' && page + 1 >= data.totalPages) ||
+            (data.last === undefined && data.totalPages === undefined && data.content.length < 50)) break;
+        page++;
     }
-    if (Array.isArray(data.requests)) {
-        return data.requests;
-    }
-    if (Array.isArray(data.content)) {
-        return data.content;
-    }
-    if (Array.isArray(data.data)) {
-        return data.data;
-    }
-    if (Array.isArray(data.items)) {
-        return data.items;
-    }
-    return [];
+    return results;
 }
-function extractMatches(data) {
-    if (Array.isArray(data)) {
-        return data;
-    }
-    if (Array.isArray(data.content)) {
-        return data.content;
-    }
-    if (Array.isArray(data.matches)) {
-        return data.matches;
-    }
-    if (Array.isArray(data.data)) {
-        return data.data;
-    }
-    if (Array.isArray(data.items)) {
-        return data.items;
-    }
-    return [];
-}
-function normalizeMatches(data, requestId) {
-    const matches = extractMatches(data);
-    return matches.map((match) => ({
-        id: match.id ??
-            match.donorProfileId ??
-            match.userId ??
-            `${requestId}-${match.donorProfileId ?? match.userId}`,
-        donorId: match.donorProfileId ??
-            match.donorId ??
-            match.userId,
-        donorName: match.fullName ??
-            match.donorName ??
-            'Unknown Donor',
-        donorEmail: match.donorEmail,
-        donorPhone: match.donorPhone,
-        bloodGroup: match.bloodGroup ?? '',
-        verificationStatus: match.verificationStatus ?? 'PENDING',
-        isAvailable: match.available ?? false,
-        status: match.status ?? 'PENDING',
-        matchedAt: match.matchedAt,
-        requestId: match.requestId ?? requestId,
+
+function normalizeMatches(items, requestId, persisted) {
+    return items.map((item) => ({
+        ...item,
+        id: item.matchId ?? item.donorProfileId ?? item.userId,
+        donorId: item.donorProfileId ?? item.donorUserId ?? item.userId,
+        donorName: item.donorName ?? item.fullName ?? 'Unknown Donor',
+        donorEmail: item.donorEmail ?? null,
+        donorPhone: item.donorPhone ?? null,
+        bloodGroup: item.bloodGroup ?? '',
+        verificationStatus: item.verificationStatus ?? 'PENDING',
+        isAvailable: item.donorAvailable ?? item.available ?? false,
+        status: persisted ? (item.status ?? 'PENDING') : 'ELIGIBLE',
+        matchedAt: item.matchedAt ?? null,
+        requestId: item.bloodRequestId ?? requestId,
     }));
 }
+
 export async function getPatientBloodRequests() {
-    const response = await apiClient.get('/api/blood-requests/my');
-    return normalizeBloodRequests(response.data);
+    return getAllPages('/api/blood-requests/my');
 }
+
 export async function getBloodRequestById(requestId) {
     const response = await apiClient.get(`/api/blood-requests/${requestId}`);
     return response.data;
 }
+
 export async function createBloodRequest(data) {
-    const payload = {
+    const response = await apiClient.post('/api/blood-requests', {
         ...data,
-        bloodGroup: toInternalBloodGroup(data.bloodGroup) ||
-            data.bloodGroup,
-    };
-    const response = await apiClient.post('/api/blood-requests', payload);
+        unitsRequired: Number(data.unitsRequired),
+        bloodGroup: data.bloodGroup,
+    });
     return response.data;
 }
+
 export async function getMatchingDonors(requestId) {
-    const response = await apiClient.get(`/api/blood-requests/${requestId}/matches`);
-    return normalizeMatches(response.data, requestId);
+    return normalizeMatches(await getAllPages(`/api/blood-requests/${requestId}/matches`), requestId, false);
 }
+
 export async function getPersistedMatches(requestId) {
-    const response = await apiClient.get(`/api/blood-requests/${requestId}/matches/persisted`);
-    return normalizeMatches(response.data, requestId);
+    return normalizeMatches(await getAllPages(`/api/blood-requests/${requestId}/matches/persisted`), requestId, true);
 }
+
 export async function cancelBloodRequest(requestId) {
-    const response = await apiClient.patch(`/api/blood-requests/${requestId}/cancel`);
-    return response.data;
+    await apiClient.patch(`/api/blood-requests/${requestId}/cancel`);
 }
+
 export async function fulfillBloodRequest(requestId) {
-    const response = await apiClient.patch(`/api/blood-requests/${requestId}/fulfill`);
-    return response.data;
+    await apiClient.patch(`/api/blood-requests/${requestId}/fulfill`);
 }

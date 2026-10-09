@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useMutation, useQueryClient, } from '@tanstack/react-query';
-import apiClient from '@/api/client';
-import { getHospitalProfile } from '@/api/hospital.api';
+import { getHospitalProfile, createHospitalProfile, saveHospitalProfile } from '@/api/hospital.api';
+
 import { hospitalProfileSchema, } from '@/lib/validation';
 import { useToast } from '@/hooks/useToast';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -90,8 +90,7 @@ export function HospitalProfilePage() {
      */
     const createMutation = useMutation({
         mutationFn: async (data) => {
-            const response = await apiClient.post('/api/hospital/profile', data);
-            return response.data;
+            return createHospitalProfile(data);
         },
         onSuccess: () => {
             setServerError(null);
@@ -117,8 +116,7 @@ export function HospitalProfilePage() {
      */
     const updateMutation = useMutation({
         mutationFn: async (data) => {
-            const response = await apiClient.put('/api/hospital/profile', data);
-            return response.data;
+            return saveHospitalProfile(data);
         },
         onSuccess: () => {
             setServerError(null);

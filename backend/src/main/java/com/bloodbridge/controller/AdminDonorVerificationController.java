@@ -1,6 +1,8 @@
 package com.bloodbridge.controller;
 
 import com.bloodbridge.dto.admin.DonorVerificationRequest;
+import com.bloodbridge.dto.donor.DonorSearchResponse;
+import org.springframework.data.domain.Page;
 import com.bloodbridge.service.AdminDonorVerificationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,14 @@ public class AdminDonorVerificationController {
 
         this.adminDonorVerificationService =
                 adminDonorVerificationService;
+    }
+
+    @GetMapping("/pending")
+    public Page<DonorSearchResponse> pendingDonors(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        if (page < 0 || size < 1 || size > 50) throw new IllegalArgumentException("Invalid pagination");
+        return adminDonorVerificationService.listPendingDonors(page, size);
     }
 
     @PatchMapping("/{donorProfileId}/verify")

@@ -16,13 +16,19 @@ public class BloodRequestService {
 
     private final BloodRequestRepository bloodRequestRepository;
     private final UserRepository userRepository;
+    private final DonorMatchingService donorMatchingService;
+    private final HospitalService hospitalService;
 
     public BloodRequestService(
             BloodRequestRepository bloodRequestRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            DonorMatchingService donorMatchingService,
+            HospitalService hospitalService) {
 
         this.bloodRequestRepository = bloodRequestRepository;
         this.userRepository = userRepository;
+        this.donorMatchingService = donorMatchingService;
+        this.hospitalService = hospitalService;
     }
 
     // =========================================================
@@ -84,6 +90,7 @@ public class BloodRequestService {
         BloodRequest saved =
                 bloodRequestRepository.save(bloodRequest);
 
+        donorMatchingService.matchNewRequest(saved);
         return toResponse(saved);
     }
 
@@ -181,6 +188,8 @@ public class BloodRequestService {
         );
 
         bloodRequestRepository.save(bloodRequest);
+        hospitalService.cancelReservationsForRequest(bloodRequest.getId());
+        donorMatchingService.cancelAllMatchesForRequest(bloodRequest.getId());
     }
 
     // =========================================================

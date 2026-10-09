@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -157,7 +156,11 @@ export function HospitalProfilePage() {
      * =========================================================
      */
     if (isLoading) {
-        return (_jsx(PageContainer, { title: "Hospital Facility Profile", description: "Hospital accreditation details, license numbers, and medical facility contact information.", children: _jsx("div", { className: "py-20 flex justify-center", children: _jsx(Spinner, { size: "lg", label: "Loading hospital profile..." }) }) }));
+        return (<PageContainer title="Hospital Facility Profile" description="Hospital accreditation details, license numbers, and medical facility contact information.">
+        <div className="py-20 flex justify-center">
+          <Spinner size="lg" label="Loading hospital profile..."/>
+        </div>
+      </PageContainer>);
     }
     /*
      * =========================================================
@@ -169,12 +172,99 @@ export function HospitalProfilePage() {
      * =========================================================
      */
     if (profileNotFound) {
-        return (_jsx(PageContainer, { title: "Create Hospital Facility Profile", description: "Register your medical facility before managing blood inventory and reservations.", children: _jsx("div", { className: "max-w-4xl mx-auto", children: _jsxs(Card, { children: [_jsx(CardHeader, { className: "bg-amber-50 border-b border-amber-100", children: _jsxs("div", { className: "flex items-start gap-3", children: [_jsx("div", { className: "w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0", children: _jsx(Building2, { className: "w-5 h-5" }) }), _jsxs("div", { children: [_jsx(CardTitle, { className: "text-sm font-semibold text-slate-800", children: "Facility Profile Required" }), _jsx(CardDescription, { className: "mt-1", children: "Your hospital account is active, but a facility profile has not been created yet. Complete the details below to register the hospital." })] })] }) }), _jsxs(CardContent, { className: "p-6", children: [serverError && (_jsxs("div", { role: "alert", className: "mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5", children: [_jsx(AlertCircle, { className: "w-4 h-4 shrink-0 text-rose-600 mt-0.5" }), _jsx("div", { className: "flex-1 leading-relaxed", children: serverError })] })), _jsxs("form", { onSubmit: handleSubmit(onSubmit), className: "space-y-5", noValidate: true, children: [_jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [_jsx(Input, { label: "Hospital / Clinic Name", type: "text", required: true, placeholder: "Test Hospital Hyderabad", error: errors.hospitalName?.message, ...register('hospitalName') }), _jsx(Input, { label: "Medical Registration / License Number", type: "text", required: true, placeholder: "HOSP-TEST-001", error: errors.registrationNumber
-                                                        ?.message, ...register('registrationNumber') })] }), _jsx(Input, { label: "Facility Street Address", type: "text", required: true, placeholder: "Banjara Hills, Hyderabad", error: errors.address?.message, ...register('address') }), _jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-3 gap-4", children: [_jsx(Input, { label: "City", type: "text", required: true, placeholder: "Hyderabad", error: errors.city?.message, ...register('city') }), _jsx(Input, { label: "State / Province", type: "text", required: true, placeholder: "Telangana", error: errors.state?.message, ...register('state') }), _jsx(Input, { label: "Contact Phone", type: "tel", required: true, placeholder: "9876543210", error: errors.phone?.message, ...register('phone') })] }), _jsx("div", { className: "p-4 rounded-xl bg-blue-50 border border-blue-100", children: _jsxs("div", { className: "flex items-start gap-2.5", children: [_jsx(ShieldCheck, { className: "w-4 h-4 text-blue-600 mt-0.5 shrink-0" }), _jsxs("div", { className: "text-xs text-blue-800 leading-relaxed", children: ["After submission, the hospital profile will be marked as", _jsxs("strong", { children: [' ', "Pending Administrator Review"] }), ". An administrator must verify the facility before it becomes an accredited facility."] })] }) }), _jsx("div", { className: "pt-4 border-t border-slate-100 flex justify-end", children: _jsx(Button, { type: "submit", variant: "primary", size: "md", isLoading: isSubmitting ||
-                                                    createMutation.isPending, leftIcon: _jsx(Building2, { className: "w-4 h-4" }), children: createMutation.isPending ||
-                                                    isSubmitting
-                                                    ? 'Creating Facility...'
-                                                    : 'Create Facility Profile' }) })] })] })] }) }) }));
+        return (<PageContainer title="Create Hospital Facility Profile" description="Register your medical facility before managing blood inventory and reservations.">
+        <div className="max-w-4xl mx-auto">
+          <Card>
+            <CardHeader className="bg-amber-50 border-b border-amber-100">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                  <Building2 className="w-5 h-5"/>
+                </div>
+
+                <div>
+                  <CardTitle className="text-sm font-semibold text-slate-800">
+                    Facility Profile Required
+                  </CardTitle>
+
+                  <CardDescription className="mt-1">
+                    Your hospital account is active, but
+                    a facility profile has not been created
+                    yet. Complete the details below to
+                    register the hospital.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-6">
+              {serverError && (<div role="alert" className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5"/>
+
+                  <div className="flex-1 leading-relaxed">
+                    {serverError}
+                  </div>
+                </div>)}
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+                {/* HOSPITAL NAME + REGISTRATION */}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input label="Hospital / Clinic Name" type="text" required placeholder="Test Hospital Hyderabad" error={errors.hospitalName?.message} {...register('hospitalName')}/>
+
+                  <Input label="Medical Registration / License Number" type="text" required placeholder="HOSP-TEST-001" error={errors.registrationNumber
+                ?.message} {...register('registrationNumber')}/>
+                </div>
+
+                {/* ADDRESS */}
+
+                <Input label="Facility Street Address" type="text" required placeholder="Banjara Hills, Hyderabad" error={errors.address?.message} {...register('address')}/>
+
+                {/* CITY / STATE / PHONE */}
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Input label="City" type="text" required placeholder="Hyderabad" error={errors.city?.message} {...register('city')}/>
+
+                  <Input label="State / Province" type="text" required placeholder="Telangana" error={errors.state?.message} {...register('state')}/>
+
+                  <Input label="Contact Phone" type="tel" required placeholder="9876543210" error={errors.phone?.message} {...register('phone')}/>
+                </div>
+
+                {/* INFO */}
+
+                <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+                  <div className="flex items-start gap-2.5">
+                    <ShieldCheck className="w-4 h-4 text-blue-600 mt-0.5 shrink-0"/>
+
+                    <div className="text-xs text-blue-800 leading-relaxed">
+                      After submission, the hospital
+                      profile will be marked as
+                      <strong>
+                        {' '}
+                        Pending Administrator Review
+                      </strong>
+                      . An administrator must verify the
+                      facility before it becomes an
+                      accredited facility.
+                    </div>
+                  </div>
+                </div>
+
+                {/* SUBMIT */}
+
+                <div className="pt-4 border-t border-slate-100 flex justify-end">
+                  <Button type="submit" variant="primary" size="md" isLoading={isSubmitting ||
+                createMutation.isPending} leftIcon={<Building2 className="w-4 h-4"/>}>
+                    {createMutation.isPending ||
+                isSubmitting
+                ? 'Creating Facility...'
+                : 'Create Facility Profile'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </PageContainer>);
     }
     /*
      * =========================================================
@@ -182,8 +272,10 @@ export function HospitalProfilePage() {
      * =========================================================
      */
     if (isError) {
-        return (_jsx(PageContainer, { title: "Hospital Facility Profile", description: "Hospital accreditation details, license numbers, and medical facility contact information.", children: _jsx(ErrorState, { title: "Could not load profile", message: getApiErrorMessage(error) ||
-                    'Failed to retrieve facility details from backend.', onRetry: () => refetch() }) }));
+        return (<PageContainer title="Hospital Facility Profile" description="Hospital accreditation details, license numbers, and medical facility contact information.">
+        <ErrorState title="Could not load profile" message={getApiErrorMessage(error) ||
+                'Failed to retrieve facility details from backend.'} onRetry={() => refetch()}/>
+      </PageContainer>);
     }
     /*
      * =========================================================
@@ -195,11 +287,119 @@ export function HospitalProfilePage() {
             'VERIFIED';
     const isSaving = isSubmitting ||
         updateMutation.isPending;
-    return (_jsx(PageContainer, { title: "Hospital Facility Profile", description: "Hospital accreditation details, license numbers, and medical facility contact information.", children: _jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [_jsxs(Card, { children: [_jsx(CardHeader, { className: "bg-slate-50 border-b border-slate-100", children: _jsx(CardTitle, { className: "text-sm font-semibold text-slate-800", children: "Accreditation Status" }) }), _jsxs(CardContent, { className: "p-5 space-y-4", children: [_jsxs("div", { children: [_jsx("span", { className: "text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1", children: "Verification Status" }), _jsx("div", { className: "flex items-center gap-2", children: isVerified ? (_jsx(Badge, { variant: "verified", children: "Accredited Facility" })) : (_jsx(Badge, { variant: "pending", children: "Pending Administrator Review" })) }), _jsx("p", { className: "text-xs text-slate-500 mt-2 leading-relaxed", children: isVerified
-                                                ? 'This medical center is verified to manage inventory and reserve blood units.'
-                                                : 'System administrators review licenses prior to active emergency blood operations.' })] }), _jsxs("div", { className: "pt-3 border-t border-slate-100", children: [_jsx("span", { className: "text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1", children: "Registration / License" }), _jsx("p", { className: "text-sm font-bold text-slate-900", children: profile?.registrationNumber ||
-                                                'Not configured' })] }), isVerified && (_jsx("div", { className: "pt-3 border-t border-slate-100", children: _jsxs("div", { className: "flex items-center gap-2 text-emerald-700", children: [_jsx(CheckCircle2, { className: "w-4 h-4" }), _jsx("span", { className: "text-xs font-semibold", children: "Facility Verified" })] }) }))] })] }), _jsx("div", { className: "lg:col-span-2", children: _jsxs(Card, { children: [_jsxs(CardHeader, { className: "bg-slate-50 border-b border-slate-100", children: [_jsx(CardTitle, { className: "text-sm font-semibold text-slate-800", children: "Facility Information" }), _jsx(CardDescription, { children: "Keep contact telephone and address up to date for emergency donor dispatch." })] }), _jsxs(CardContent, { className: "p-6", children: [serverError && (_jsxs("div", { role: "alert", className: "mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5", children: [_jsx(AlertCircle, { className: "w-4 h-4 shrink-0 text-rose-600 mt-0.5" }), _jsx("div", { className: "flex-1 leading-relaxed", children: serverError })] })), _jsxs("form", { onSubmit: handleSubmit(onSubmit), className: "space-y-4", noValidate: true, children: [_jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [_jsx(Input, { label: "Hospital / Clinic Name", type: "text", required: true, error: errors.hospitalName?.message, ...register('hospitalName') }), _jsx(Input, { label: "Medical Registration / License Number", type: "text", required: true, error: errors.registrationNumber
-                                                            ?.message, ...register('registrationNumber') })] }), _jsx(Input, { label: "Facility Street Address", type: "text", required: true, error: errors.address?.message, ...register('address') }), _jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-3 gap-4", children: [_jsx(Input, { label: "City", type: "text", required: true, error: errors.city?.message, ...register('city') }), _jsx(Input, { label: "State / Province", type: "text", required: true, error: errors.state?.message, ...register('state') }), _jsx(Input, { label: "Contact Phone", type: "tel", required: true, error: errors.phone?.message, ...register('phone') })] }), _jsx("div", { className: "pt-4 border-t border-slate-100 flex justify-end", children: _jsx(Button, { type: "submit", variant: "primary", size: "md", isLoading: isSaving, children: isSaving
-                                                        ? 'Saving Facility...'
-                                                        : 'Save Changes' }) })] })] })] }) })] }) }));
+    return (<PageContainer title="Hospital Facility Profile" description="Hospital accreditation details, license numbers, and medical facility contact information.">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ===================================================
+            VERIFICATION STATUS
+            =================================================== */}
+
+        <Card>
+          <CardHeader className="bg-slate-50 border-b border-slate-100">
+            <CardTitle className="text-sm font-semibold text-slate-800">
+              Accreditation Status
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="p-5 space-y-4">
+            <div>
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+                Verification Status
+              </span>
+
+              <div className="flex items-center gap-2">
+                {isVerified ? (<Badge variant="verified">
+                    Accredited Facility
+                  </Badge>) : (<Badge variant="pending">
+                    Pending Administrator Review
+                  </Badge>)}
+              </div>
+
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                {isVerified
+            ? 'This medical center is verified to manage inventory and reserve blood units.'
+            : 'System administrators review licenses prior to active emergency blood operations.'}
+              </p>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+                Registration / License
+              </span>
+
+              <p className="text-sm font-bold text-slate-900">
+                {profile?.registrationNumber ||
+            'Not configured'}
+              </p>
+            </div>
+
+            {isVerified && (<div className="pt-3 border-t border-slate-100">
+                <div className="flex items-center gap-2 text-emerald-700">
+                  <CheckCircle2 className="w-4 h-4"/>
+
+                  <span className="text-xs font-semibold">
+                    Facility Verified
+                  </span>
+                </div>
+              </div>)}
+          </CardContent>
+        </Card>
+
+        {/* ===================================================
+            EDIT FORM
+            =================================================== */}
+
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader className="bg-slate-50 border-b border-slate-100">
+              <CardTitle className="text-sm font-semibold text-slate-800">
+                Facility Information
+              </CardTitle>
+
+              <CardDescription>
+                Keep contact telephone and address up to
+                date for emergency donor dispatch.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="p-6">
+              {serverError && (<div role="alert" className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5"/>
+
+                  <div className="flex-1 leading-relaxed">
+                    {serverError}
+                  </div>
+                </div>)}
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input label="Hospital / Clinic Name" type="text" required error={errors.hospitalName?.message} {...register('hospitalName')}/>
+
+                  <Input label="Medical Registration / License Number" type="text" required error={errors.registrationNumber
+            ?.message} {...register('registrationNumber')}/>
+                </div>
+
+                <Input label="Facility Street Address" type="text" required error={errors.address?.message} {...register('address')}/>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Input label="City" type="text" required error={errors.city?.message} {...register('city')}/>
+
+                  <Input label="State / Province" type="text" required error={errors.state?.message} {...register('state')}/>
+
+                  <Input label="Contact Phone" type="tel" required error={errors.phone?.message} {...register('phone')}/>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 flex justify-end">
+                  <Button type="submit" variant="primary" size="md" isLoading={isSaving}>
+                    {isSaving
+            ? 'Saving Facility...'
+            : 'Save Changes'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </PageContainer>);
 }

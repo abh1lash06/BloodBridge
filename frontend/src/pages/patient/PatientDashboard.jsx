@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,5 +25,141 @@ export function PatientDashboard() {
     const cancelledCount = requests.filter((r) => r.status === 'CANCELLED').length;
     const recentRequests = requests.slice(0, 5);
     const recentNotifs = notifications.slice(0, 4);
-    return (_jsxs(PageContainer, { title: `Welcome back, ${user?.fullName || 'Patient'}`, description: "Manage your emergency blood requests, monitor live donor matching, and track hospital fulfillment.", action: _jsx(Link, { to: "/patient/requests/new", children: _jsx(Button, { variant: "primary", size: "md", leftIcon: _jsx(FilePlus, { className: "w-4 h-4" }), children: "Create Blood Request" }) }), children: [_jsxs("div", { className: "grid grid-cols-2 lg:grid-cols-4 gap-4", children: [_jsx(Card, { className: "bg-white border-sky-100 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-sky-700", children: "Open Requests" }), _jsx("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: openCount })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center", children: _jsx(Clock, { className: "w-5 h-5" }) })] }) }), _jsx(Card, { className: "bg-white border-indigo-100 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-indigo-700", children: "Matched" }), _jsx("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: matchedCount })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center", children: _jsx(CheckCircle2, { className: "w-5 h-5" }) })] }) }), _jsx(Card, { className: "bg-white border-emerald-100 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-emerald-700", children: "Fulfilled" }), _jsx("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: fulfilledCount })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center", children: _jsx(PackageCheck, { className: "w-5 h-5" }) })] }) }), _jsx(Card, { className: "bg-white border-slate-200 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-slate-500", children: "Cancelled" }), _jsx("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: cancelledCount })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center", children: _jsx(AlertCircle, { className: "w-5 h-5" }) })] }) })] }), _jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [_jsxs("div", { className: "lg:col-span-2 space-y-4", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsx("h3", { className: "text-base font-semibold text-slate-900", children: "Recent Blood Requests" }), _jsxs(Link, { to: "/patient/requests", className: "text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1", children: ["View all (", requests.length, ") ", _jsx(ArrowRight, { className: "w-3 h-3" })] })] }), isLoading ? (_jsx("div", { className: "py-12 flex justify-center bg-white rounded-xl border border-slate-200", children: _jsx(Spinner, { size: "lg", label: "Loading blood requests..." }) })) : isError ? (_jsx(ErrorState, { title: "Failed to load requests", message: "Could not retrieve your blood requests. Please check if backend is running.", onRetry: () => refetch() })) : recentRequests.length === 0 ? (_jsx(EmptyState, { icon: _jsx(Droplet, { className: "w-6 h-6 text-rose-600" }), title: "No blood requests yet", description: "Create an emergency request to start finding matching donors and reserving blood units.", actionLabel: "Create Blood Request", onAction: () => window.location.assign('/patient/requests/new') })) : (_jsx("div", { className: "space-y-3", children: recentRequests.map((req) => (_jsx(Card, { className: "hover:border-slate-300 transition-colors", children: _jsxs(CardContent, { className: "p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4", children: [_jsxs("div", { className: "flex items-start gap-3.5", children: [_jsxs("div", { className: "w-11 h-11 rounded-xl bg-rose-50 text-rose-700 font-bold text-sm flex flex-col items-center justify-center border border-rose-200 shrink-0", children: [_jsx("span", { children: toDisplayBloodGroup(req.bloodGroup) }), _jsxs("span", { className: "text-[9px] font-normal text-rose-600 leading-none", children: [req.unitsRequired, " ", req.unitsRequired === 1 ? 'unit' : 'units'] })] }), _jsxs("div", { children: [_jsxs("div", { className: "flex items-center gap-2 mb-1 flex-wrap", children: [_jsx("h4", { className: "text-sm font-semibold text-slate-900", children: req.hospitalName }), _jsx(StatusBadge, { status: req.status }), _jsx(StatusBadge, { status: req.urgency })] }), _jsxs("p", { className: "text-xs text-slate-500", children: ["Required by: ", _jsx("span", { className: "font-medium text-slate-700", children: formatDate(req.requiredDate) }), req.createdAt && (_jsxs("span", { className: "ml-2 text-slate-400", children: ["(Created: ", formatDate(req.createdAt), ")"] }))] })] })] }), _jsx(Link, { to: `/patient/requests/${req.id}`, className: "shrink-0 sm:self-center", children: _jsx(Button, { variant: "outline", size: "sm", leftIcon: _jsx(Eye, { className: "w-3.5 h-3.5" }), className: "w-full sm:w-auto", children: "View Details" }) })] }) }, req.id))) }))] }), _jsxs("div", { className: "space-y-4", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsx("h3", { className: "text-base font-semibold text-slate-900", children: "Recent Updates" }), _jsx(Link, { to: "/notifications", className: "text-xs font-semibold text-rose-600 hover:text-rose-700", children: "See all" })] }), _jsxs(Card, { children: [_jsxs(CardHeader, { className: "py-3 px-4 bg-slate-50 border-b border-slate-100 flex-row items-center gap-2", children: [_jsx(Bell, { className: "w-4 h-4 text-slate-600" }), _jsx(CardTitle, { className: "text-xs font-semibold text-slate-700 uppercase tracking-wider", children: "Emergency Alerts" })] }), _jsx(CardContent, { className: "p-0 divide-y divide-slate-100", children: recentNotifs.length === 0 ? (_jsx("div", { className: "p-6 text-center text-xs text-slate-500", children: "No notifications yet. You'll be alerted when donors accept or hospitals reserve blood." })) : (recentNotifs.map((notif) => (_jsxs("div", { className: "p-3.5 text-xs", children: [_jsx("p", { className: "font-semibold text-slate-900 mb-0.5", children: notif.title || 'Notification' }), _jsx("p", { className: "text-slate-600 line-clamp-2 leading-relaxed", children: notif.message }), _jsx("span", { className: "text-[10px] text-slate-400 mt-1 block", children: formatDateTime(notif.createdAt) })] }, notif.id)))) })] })] })] })] }));
+    return (<PageContainer title={`Welcome back, ${user?.fullName || 'Patient'}`} description="Manage your emergency blood requests, monitor live donor matching, and track hospital fulfillment." action={<Link to="/patient/requests/new">
+          <Button variant="primary" size="md" leftIcon={<FilePlus className="w-4 h-4"/>}>
+            Create Blood Request
+          </Button>
+        </Link>}>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white border-sky-100 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-sky-700">Open Requests</p>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{openCount}</h3>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+              <Clock className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-indigo-100 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-indigo-700">Matched</p>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{matchedCount}</h3>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-emerald-100 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Fulfilled</p>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{fulfilledCount}</h3>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <PackageCheck className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-slate-200 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Cancelled</p>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{cancelledCount}</h3>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center">
+              <AlertCircle className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Blood Requests */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-slate-900">Recent Blood Requests</h3>
+            <Link to="/patient/requests" className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1">
+              View all ({requests.length}) <ArrowRight className="w-3 h-3"/>
+            </Link>
+          </div>
+
+          {isLoading ? (<div className="py-12 flex justify-center bg-white rounded-xl border border-slate-200">
+              <Spinner size="lg" label="Loading blood requests..."/>
+            </div>) : isError ? (<ErrorState title="Failed to load requests" message="Could not retrieve your blood requests. Please check if backend is running." onRetry={() => refetch()}/>) : recentRequests.length === 0 ? (<EmptyState icon={<Droplet className="w-6 h-6 text-rose-600"/>} title="No blood requests yet" description="Create an emergency request to start finding matching donors and reserving blood units." actionLabel="Create Blood Request" onAction={() => window.location.assign('/patient/requests/new')}/>) : (<div className="space-y-3">
+              {recentRequests.map((req) => (<Card key={req.id} className="hover:border-slate-300 transition-colors">
+                  <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-700 font-bold text-sm flex flex-col items-center justify-center border border-rose-200 shrink-0">
+                        <span>{toDisplayBloodGroup(req.bloodGroup)}</span>
+                        <span className="text-[9px] font-normal text-rose-600 leading-none">
+                          {req.unitsRequired} {req.unitsRequired === 1 ? 'unit' : 'units'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h4 className="text-sm font-semibold text-slate-900">
+                            {req.hospitalName}
+                          </h4>
+                          <StatusBadge status={req.status}/>
+                          <StatusBadge status={req.urgency}/>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          Required by: <span className="font-medium text-slate-700">{formatDate(req.requiredDate)}</span>
+                          {req.createdAt && (<span className="ml-2 text-slate-400">
+                              (Created: {formatDate(req.createdAt)})
+                            </span>)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Link to={`/patient/requests/${req.id}`} className="shrink-0 sm:self-center">
+                      <Button variant="outline" size="sm" leftIcon={<Eye className="w-3.5 h-3.5"/>} className="w-full sm:w-auto">
+                        View Details
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>))}
+            </div>)}
+        </div>
+
+        {/* Recent Notifications Sidebar Card */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-slate-900">Recent Updates</h3>
+            <Link to="/notifications" className="text-xs font-semibold text-rose-600 hover:text-rose-700">
+              See all
+            </Link>
+          </div>
+
+          <Card>
+            <CardHeader className="py-3 px-4 bg-slate-50 border-b border-slate-100 flex-row items-center gap-2">
+              <Bell className="w-4 h-4 text-slate-600"/>
+              <CardTitle className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Emergency Alerts
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 divide-y divide-slate-100">
+              {recentNotifs.length === 0 ? (<div className="p-6 text-center text-xs text-slate-500">
+                  No notifications yet. You'll be alerted when donors accept or hospitals reserve blood.
+                </div>) : (recentNotifs.map((notif) => (<div key={notif.id} className="p-3.5 text-xs">
+                    <p className="font-semibold text-slate-900 mb-0.5">{notif.title || 'Notification'}</p>
+                    <p className="text-slate-600 line-clamp-2 leading-relaxed">{notif.message}</p>
+                    <span className="text-[10px] text-slate-400 mt-1 block">
+                      {formatDateTime(notif.createdAt)}
+                    </span>
+                  </div>)))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </PageContainer>);
 }

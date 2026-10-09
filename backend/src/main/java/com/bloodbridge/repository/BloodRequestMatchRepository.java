@@ -31,6 +31,8 @@ public interface BloodRequestMatchRepository
             Pageable pageable
     );
 
+    long countByBloodRequestIdAndStatus(Long bloodRequestId, BloodRequestMatch.MatchStatus status);
+
     List<BloodRequestMatch> findByBloodRequestIdAndStatus(
             Long bloodRequestId,
             BloodRequestMatch.MatchStatus status

@@ -1,4 +1,3 @@
-import { jsx as _jsx } from "react/jsx-runtime";
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { login as apiLogin, register as apiRegister } from '@/api/auth.api';
 import { setOnUnauthorizedCallback } from '@/api/client';
@@ -73,7 +72,7 @@ export function AuthProvider({ children }) {
     const register = async (data) => {
         return await apiRegister(data);
     };
-    return (_jsx(AuthContext.Provider, { value: {
+    return (<AuthContext.Provider value={{
             user,
             accessToken,
             isAuthenticated: !!accessToken && !!user,
@@ -82,7 +81,9 @@ export function AuthProvider({ children }) {
             register,
             logout,
             getRoleDashboardPath,
-        }, children: children }));
+        }}>
+      {children}
+    </AuthContext.Provider>);
 }
 export function useAuth() {
     const context = useContext(AuthContext);

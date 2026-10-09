@@ -1,4 +1,3 @@
-import { jsx as _jsx } from "react/jsx-runtime";
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
@@ -33,114 +32,144 @@ export const router = createBrowserRouter([
     // Public Routes
     {
         path: '/',
-        element: _jsx(LandingPage, {}),
+        element: <LandingPage />,
     },
     {
         path: '/login',
-        element: _jsx(LoginPage, {}),
+        element: <LoginPage />,
     },
     {
         path: '/register',
-        element: _jsx(RegisterPage, {}),
+        element: <RegisterPage />,
     },
     {
         path: '/403',
-        element: _jsx(ForbiddenPage, {}),
+        element: <ForbiddenPage />,
     },
     {
         path: '/404',
-        element: _jsx(NotFoundPage, {}),
+        element: <NotFoundPage />,
     },
     // Authenticated Protected App Shell
     {
-        element: (_jsx(ProtectedRoute, { children: _jsx(AppLayout, {}) })),
+        element: (<ProtectedRoute>
+        <AppLayout />
+      </ProtectedRoute>),
         children: [
             // Notifications (all authenticated roles)
             {
                 path: '/notifications',
-                element: _jsx(NotificationsPage, {}),
+                element: <NotificationsPage />,
             },
             // Patient Routes
             {
                 path: '/patient',
-                element: _jsx(Navigate, { to: "/patient/dashboard", replace: true }),
+                element: <Navigate to="/patient/dashboard" replace/>,
             },
             {
                 path: '/patient/dashboard',
-                element: (_jsx(RoleGuard, { allowedRoles: ['PATIENT'], children: _jsx(PatientDashboard, {}) })),
+                element: (<RoleGuard allowedRoles={['PATIENT']}>
+            <PatientDashboard />
+          </RoleGuard>),
             },
             {
                 path: '/patient/requests',
-                element: (_jsx(RoleGuard, { allowedRoles: ['PATIENT'], children: _jsx(PatientRequestsPage, {}) })),
+                element: (<RoleGuard allowedRoles={['PATIENT']}>
+            <PatientRequestsPage />
+          </RoleGuard>),
             },
             {
                 path: '/patient/requests/new',
-                element: (_jsx(RoleGuard, { allowedRoles: ['PATIENT'], children: _jsx(CreateRequestPage, {}) })),
+                element: (<RoleGuard allowedRoles={['PATIENT']}>
+            <CreateRequestPage />
+          </RoleGuard>),
             },
             {
                 path: '/patient/requests/:requestId',
-                element: (_jsx(RoleGuard, { allowedRoles: ['PATIENT'], children: _jsx(RequestDetailPage, {}) })),
+                element: (<RoleGuard allowedRoles={['PATIENT']}>
+            <RequestDetailPage />
+          </RoleGuard>),
             },
             // Donor Routes
             {
                 path: '/donor',
-                element: _jsx(Navigate, { to: "/donor/dashboard", replace: true }),
+                element: <Navigate to="/donor/dashboard" replace/>,
             },
             {
                 path: '/donor/dashboard',
-                element: (_jsx(RoleGuard, { allowedRoles: ['DONOR'], children: _jsx(DonorDashboard, {}) })),
+                element: (<RoleGuard allowedRoles={['DONOR']}>
+            <DonorDashboard />
+          </RoleGuard>),
             },
             {
                 path: '/donor/profile',
-                element: (_jsx(RoleGuard, { allowedRoles: ['DONOR'], children: _jsx(DonorProfilePage, {}) })),
+                element: (<RoleGuard allowedRoles={['DONOR']}>
+            <DonorProfilePage />
+          </RoleGuard>),
             },
             {
                 path: '/donor/matches',
-                element: (_jsx(RoleGuard, { allowedRoles: ['DONOR'], children: _jsx(DonorMatchesPage, {}) })),
+                element: (<RoleGuard allowedRoles={['DONOR']}>
+            <DonorMatchesPage />
+          </RoleGuard>),
             },
             // Hospital Routes
             {
                 path: '/hospital',
-                element: _jsx(Navigate, { to: "/hospital/dashboard", replace: true }),
+                element: <Navigate to="/hospital/dashboard" replace/>,
             },
             {
                 path: '/hospital/dashboard',
-                element: (_jsx(RoleGuard, { allowedRoles: ['HOSPITAL'], children: _jsx(HospitalDashboard, {}) })),
+                element: (<RoleGuard allowedRoles={['HOSPITAL']}>
+            <HospitalDashboard />
+          </RoleGuard>),
             },
             {
                 path: '/hospital/profile',
-                element: (_jsx(RoleGuard, { allowedRoles: ['HOSPITAL'], children: _jsx(HospitalProfilePage, {}) })),
+                element: (<RoleGuard allowedRoles={['HOSPITAL']}>
+            <HospitalProfilePage />
+          </RoleGuard>),
             },
             {
                 path: '/hospital/inventory',
-                element: (_jsx(RoleGuard, { allowedRoles: ['HOSPITAL'], children: _jsx(HospitalInventoryPage, {}) })),
+                element: (<RoleGuard allowedRoles={['HOSPITAL']}>
+            <HospitalInventoryPage />
+          </RoleGuard>),
             },
             {
                 path: '/hospital/reservations',
-                element: (_jsx(RoleGuard, { allowedRoles: ['HOSPITAL'], children: _jsx(HospitalReservationsPage, {}) })),
+                element: (<RoleGuard allowedRoles={['HOSPITAL']}>
+            <HospitalReservationsPage />
+          </RoleGuard>),
             },
             // Admin Routes
             {
                 path: '/admin',
-                element: _jsx(Navigate, { to: "/admin/dashboard", replace: true }),
+                element: <Navigate to="/admin/dashboard" replace/>,
             },
             {
                 path: '/admin/dashboard',
-                element: (_jsx(RoleGuard, { allowedRoles: ['ADMIN'], children: _jsx(AdminDashboard, {}) })),
+                element: (<RoleGuard allowedRoles={['ADMIN']}>
+            <AdminDashboard />
+          </RoleGuard>),
             },
             {
                 path: '/admin/donors',
-                element: (_jsx(RoleGuard, { allowedRoles: ['ADMIN'], children: _jsx(DonorVerificationPage, {}) })),
+                element: (<RoleGuard allowedRoles={['ADMIN']}>
+            <DonorVerificationPage />
+          </RoleGuard>),
             },
             {
                 path: '/admin/hospitals',
-                element: (_jsx(RoleGuard, { allowedRoles: ['ADMIN'], children: _jsx(HospitalVerificationPage, {}) })),
+                element: (<RoleGuard allowedRoles={['ADMIN']}>
+            <HospitalVerificationPage />
+          </RoleGuard>),
             },
         ],
     },
     // Fallback 404
     {
         path: '*',
-        element: _jsx(NotFoundPage, {}),
+        element: <NotFoundPage />,
     },
 ]);

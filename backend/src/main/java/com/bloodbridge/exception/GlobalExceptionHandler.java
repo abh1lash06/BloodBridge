@@ -1,10 +1,16 @@
+
 package com.bloodbridge.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.http.converter.HttpMessageNotReadableException;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,6 +25,10 @@ public class GlobalExceptionHandler {
     private static final Logger log =
             LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    // =========================================================
+    // ILLEGAL ARGUMENT: HTTP 400
+    // =========================================================
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(
             IllegalArgumentException exception,
@@ -30,6 +40,41 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
     }
+
+    // =========================================================
+    // INVALID REQUEST BODY: HTTP 400
+    // Handles JSON deserialization errors, including attempts
+    // to supply a bloodGroup during donor profile updates.
+    // =========================================================
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadableRequest(
+            HttpMessageNotReadableException exception,
+            HttpServletRequest request) {
+
+        String message =
+                "Invalid request body. Check the submitted fields.";
+
+        Throwable cause = exception.getMostSpecificCause();
+
+        if (cause != null
+                && cause.getMessage() != null
+                && cause.getMessage().contains(
+                        "Blood group cannot be changed once registered")) {
+
+            message = "Blood group cannot be changed once registered";
+        }
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                message,
+                request.getRequestURI()
+        );
+    }
+
+    // =========================================================
+    // BEAN VALIDATION ERRORS: HTTP 400
+    // =========================================================
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(
@@ -60,17 +105,15 @@ public class GlobalExceptionHandler {
                 .body(body);
     }
 
+    // =========================================================
+    // UNEXPECTED ERRORS: HTTP 500
+    // =========================================================
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(
             Exception exception,
             HttpServletRequest request) {
 
-        /*
-         * Log the complete exception and stack trace.
-         *
-         * The API still returns a safe generic message to the client,
-         * while the real exception is visible in the Spring Boot terminal.
-         */
         log.error(
                 "Unhandled exception for {} {}",
                 request.getMethod(),
@@ -84,6 +127,10 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
     }
+
+    // =========================================================
+    // COMMON ERROR RESPONSE BUILDER
+    // =========================================================
 
     private ResponseEntity<Map<String, Object>> buildResponse(
             HttpStatus status,

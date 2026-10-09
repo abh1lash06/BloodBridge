@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true}); try{require('fs').rmSync('server.js',{force:true})}catch(e){}\"",
+    "lint": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

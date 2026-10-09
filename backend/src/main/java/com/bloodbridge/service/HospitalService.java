@@ -20,6 +20,8 @@ import com.bloodbridge.repository.HospitalBloodReservationRepository;
 import com.bloodbridge.repository.HospitalProfileRepository;
 import com.bloodbridge.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -350,7 +352,7 @@ public class HospitalService {
 
         BloodRequest bloodRequest =
                 bloodRequestRepository
-                        .findById(bloodRequestId)
+                        .findForUpdate(bloodRequestId)
                         .orElseThrow(() ->
                                 new IllegalArgumentException(
                                         "Blood request not found"
@@ -372,6 +374,12 @@ public class HospitalService {
          * Therefore the reservation must cover the complete
          * requested quantity.
          */
+        if (bloodRequestMatchRepository.countByBloodRequestIdAndStatus(
+                bloodRequest.getId(), BloodRequestMatch.MatchStatus.ACCEPTED) > 0) {
+            throw new IllegalArgumentException(
+                    "Donors have already accepted this request; a full hospital reservation would duplicate units");
+        }
+
         if (units != bloodRequest.getUnitsRequired()) {
             throw new IllegalArgumentException(
                     "Hospital must reserve all requested blood units"
@@ -832,9 +840,37 @@ public class HospitalService {
         );
     }
 
+    @Transactional
+    public void cancelReservationsForRequest(Long requestId) {
+        List<HospitalBloodReservation> reservations = hospitalBloodReservationRepository
+                .findByBloodRequestIdOrderByCreatedAtDesc(requestId);
+        for (HospitalBloodReservation reservation : reservations) {
+            if (reservation.getStatus() != HospitalBloodReservation.ReservationStatus.RESERVED) continue;
+            HospitalBloodInventory.BloodGroup group = HospitalBloodInventory.BloodGroup.valueOf(
+                    reservation.getBloodGroup().name());
+            HospitalBloodInventory inventory = hospitalBloodInventoryRepository
+                    .findForUpdate(reservation.getHospitalProfile().getId(), group)
+                    .orElseThrow(() -> new IllegalStateException("Reserved inventory not found"));
+            if (inventory.getReservedUnits() < reservation.getUnitsReserved()) {
+                throw new IllegalStateException("Reservation exceeds held inventory");
+            }
+            inventory.setReservedUnits(inventory.getReservedUnits() - reservation.getUnitsReserved());
+            reservation.setStatus(HospitalBloodReservation.ReservationStatus.CANCELLED);
+            reservation.setReleasedAt(LocalDateTime.now());
+            hospitalBloodInventoryRepository.save(inventory);
+            hospitalBloodReservationRepository.save(reservation);
+        }
+    }
+
     // =========================================================
     // ADMIN HOSPITAL VERIFICATION
     // =========================================================
+
+    @Transactional(readOnly = true)
+    public Page<HospitalProfileResponse> listUnverifiedHospitals(int page, int size) {
+        return hospitalProfileRepository.findByVerifiedFalse(PageRequest.of(page, size))
+                .map(this::toProfileResponse);
+    }
 
     @Transactional
     public HospitalProfileResponse verifyHospital(

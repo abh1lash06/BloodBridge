@@ -12,6 +12,8 @@ public interface DonorProfileRepository
 
     Optional<DonorProfile> findByUserId(Long userId);
 
+    Page<DonorProfile> findByVerificationStatus(DonorProfile.VerificationStatus status, Pageable pageable);
+
     boolean existsByUserId(Long userId);
 
     Page<DonorProfile> findByBloodGroupAndAvailableTrueAndVerificationStatus(

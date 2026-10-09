@@ -49,31 +49,35 @@ public class DonorProfile {
     )
     private User user;
 
+    /*
+     * Blood group is intentionally nullable because the donor profile
+     * is automatically created during registration.
+     *
+     * IMPORTANT:
+     * Once blood group is set, it cannot be changed.
+     */
     @Enumerated(EnumType.STRING)
     @Column(
             name = "blood_group",
-            nullable = false,
             length = 20
     )
+    @Setter(AccessLevel.NONE)
     private BloodGroup bloodGroup;
 
     @Column(
-            name = "date_of_birth",
-            nullable = false
+            name = "date_of_birth"
     )
     private LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
     @Column(
             name = "gender",
-            nullable = false,
             length = 20
     )
     private Gender gender;
 
     @Column(
             name = "address",
-            nullable = false,
             length = 500
     )
     private String address;
@@ -93,7 +97,8 @@ public class DonorProfile {
             nullable = false,
             length = 30
     )
-    private VerificationStatus verificationStatus = VerificationStatus.PENDING;
+    private VerificationStatus verificationStatus =
+            VerificationStatus.PENDING;
 
     @Column(
             name = "created_at",
@@ -108,8 +113,27 @@ public class DonorProfile {
     )
     private LocalDateTime updatedAt;
 
+    /*
+     * Blood group can be assigned once.
+     *
+     * If already assigned, attempting to change it is rejected.
+     */
+    public void setBloodGroup(BloodGroup bloodGroup) {
+
+        if (this.bloodGroup != null &&
+                bloodGroup != this.bloodGroup) {
+
+            throw new IllegalArgumentException(
+                    "Blood group cannot be changed once it has been set"
+            );
+        }
+
+        this.bloodGroup = bloodGroup;
+    }
+
     @PrePersist
     protected void onCreate() {
+
         LocalDateTime now = LocalDateTime.now();
 
         if (createdAt == null) {
@@ -125,7 +149,8 @@ public class DonorProfile {
         }
 
         if (verificationStatus == null) {
-            verificationStatus = VerificationStatus.PENDING;
+            verificationStatus =
+                    VerificationStatus.PENDING;
         }
     }
 

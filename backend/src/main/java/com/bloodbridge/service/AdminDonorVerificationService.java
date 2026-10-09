@@ -1,5 +1,8 @@
 package com.bloodbridge.service;
 
+import com.bloodbridge.dto.donor.DonorSearchResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import com.bloodbridge.entity.DonorProfile;
 import com.bloodbridge.entity.DonorVerificationAudit;
 import com.bloodbridge.entity.User;
@@ -15,15 +18,34 @@ public class AdminDonorVerificationService {
     private final DonorProfileRepository donorProfileRepository;
     private final DonorVerificationAuditRepository auditRepository;
     private final UserRepository userRepository;
+    private final DonorMatchingService donorMatchingService;
 
     public AdminDonorVerificationService(
             DonorProfileRepository donorProfileRepository,
             DonorVerificationAuditRepository auditRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            DonorMatchingService donorMatchingService) {
 
         this.donorProfileRepository = donorProfileRepository;
         this.auditRepository = auditRepository;
         this.userRepository = userRepository;
+        this.donorMatchingService = donorMatchingService;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DonorSearchResponse> listPendingDonors(int page, int size) {
+        return donorProfileRepository.findByVerificationStatus(
+                DonorProfile.VerificationStatus.PENDING, PageRequest.of(page, size)).map(profile ->
+                DonorSearchResponse.builder()
+                        .donorProfileId(profile.getId())
+                        .userId(profile.getUser().getId())
+                        .fullName(profile.getUser().getFullName())
+                        .bloodGroup(profile.getBloodGroup().name())
+                        .gender(profile.getGender().name())
+                        .address(profile.getAddress())
+                        .available(profile.getAvailable())
+                        .verificationStatus(profile.getVerificationStatus().name())
+                        .build());
     }
 
     @Transactional
@@ -107,6 +129,9 @@ public class AdminDonorVerificationService {
                         .build();
 
         auditRepository.save(audit);
+        if (newStatus == DonorProfile.VerificationStatus.VERIFIED) {
+            donorMatchingService.matchOpenRequestsForDonor(donorProfile);
+        }
     }
 
     private String normalizeReason(String reason) {

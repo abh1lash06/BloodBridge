@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -29,17 +28,226 @@ export function HospitalDashboard() {
     const activeReservations = reservations.filter((r) => r.status === 'RESERVED');
     const isVerified = profile?.verified === true ||
         profile?.verificationStatus === 'VERIFIED';
-    return (_jsxs(PageContainer, { title: `Hospital Operations: ${profile?.hospitalName ||
+    return (<PageContainer title={`Hospital Operations: ${profile?.hospitalName ||
             user?.fullName ||
-            'Portal'}`, description: "Manage blood bank inventory, reserve units for patient requests, and record reservation fulfillment.", action: _jsxs("div", { className: "flex items-center gap-2", children: [_jsx(Link, { to: "/hospital/inventory", children: _jsx(Button, { variant: "outline", size: "sm", leftIcon: _jsx(Package, { className: "w-4 h-4" }), children: "Update Inventory" }) }), _jsx(Link, { to: "/hospital/reservations", children: _jsxs(Button, { variant: "primary", size: "sm", leftIcon: _jsx(CalendarCheck, { className: "w-4 h-4" }), children: ["Manage Reservations (", activeReservations.length, ")"] }) })] }), children: [_jsxs("div", { className: "p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white shadow-xs", children: [_jsxs("div", { className: "flex items-center gap-3", children: [_jsx("div", { className: `w-10 h-10 rounded-xl flex items-center justify-center font-bold ${isVerified
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-amber-100 text-amber-700'}`, children: _jsx(ShieldCheck, { className: "w-5 h-5" }) }), _jsxs("div", { children: [_jsxs("div", { className: "flex items-center gap-2", children: [_jsx("h4", { className: "text-sm font-bold text-slate-900", children: profile?.hospitalName ||
-                                                    'Medical Center' }), isVerified ? (_jsx(Badge, { variant: "verified", children: "Facility Verified" })) : (_jsx(Badge, { variant: "pending", children: "Pending Admin Verification" }))] }), _jsxs("p", { className: "text-xs text-slate-500 mt-0.5", children: ["Registration #", profile?.registrationNumber ||
-                                                'Pending', ' ', "\u2022", ' ', profile?.city
-                                                ? `${profile.city}, ${profile.state}`
-                                                : 'Location unconfigured'] })] })] }), _jsx(Link, { to: "/hospital/profile", children: _jsx(Button, { variant: "outline", size: "sm", children: "View Facility Profile" }) })] }), _jsxs("div", { className: "grid grid-cols-2 lg:grid-cols-4 gap-4", children: [_jsx(Card, { className: "bg-white border-teal-100 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-teal-700", children: "Available Stock" }), _jsxs("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: [totalAvailable, ' ', _jsx("span", { className: "text-xs font-normal text-slate-500", children: "units" })] })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center", children: _jsx(Package, { className: "w-5 h-5" }) })] }) }), _jsx(Card, { className: "bg-white border-purple-100 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-purple-700", children: "Reserved Units" }), _jsxs("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: [totalReserved, ' ', _jsx("span", { className: "text-xs font-normal text-slate-500", children: "units" })] })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center", children: _jsx(Layers, { className: "w-5 h-5" }) })] }) }), _jsx(Card, { className: "bg-white border-sky-100 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-sky-700", children: "Active Holds" }), _jsx("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: activeReservations.length })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center", children: _jsx(CalendarCheck, { className: "w-5 h-5" }) })] }) }), _jsx(Card, { className: "bg-white border-indigo-100 shadow-xs", children: _jsxs(CardContent, { className: "p-4 flex items-center justify-between", children: [_jsxs("div", { children: [_jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-indigo-700", children: "Total Reservations" }), _jsx("h3", { className: "text-2xl font-bold text-slate-900 mt-1", children: reservations.length })] }), _jsx("div", { className: "w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center", children: _jsx(Building2, { className: "w-5 h-5" }) })] }) })] }), _jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6", children: [_jsxs(Card, { children: [_jsxs(CardHeader, { className: "bg-slate-50 border-b border-slate-100 flex-row items-center justify-between", children: [_jsx(CardTitle, { className: "text-sm font-semibold text-slate-800", children: "Inventory Snapshot" }), _jsxs(Link, { to: "/hospital/inventory", className: "text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1", children: ["Full Inventory", _jsx(ArrowRight, { className: "w-3 h-3" })] })] }), _jsx(CardContent, { className: "p-4", children: isInventoryLoading ? (_jsx("div", { className: "py-8 flex justify-center", children: _jsx(Spinner, { size: "md", label: "Loading inventory..." }) })) : inventory.length === 0 ? (_jsx("div", { className: "p-6 text-center text-xs text-slate-500", children: "No inventory records found. Click \"Update Inventory\" to populate stocks." })) : (_jsx("div", { className: "grid grid-cols-4 gap-2.5", children: inventory.map((item) => (_jsxs("div", { className: "p-2.5 rounded-lg border border-slate-200 bg-slate-50/60 text-center", children: [_jsx("span", { className: "text-xs font-extrabold text-rose-700 block", children: toDisplayBloodGroup(item.bloodGroup) }), _jsx("span", { className: "text-base font-bold text-slate-900 mt-0.5 block", children: item.availableUnits }), _jsxs("span", { className: "text-[10px] text-slate-400 block", children: [item.reservedUnits, " res"] })] }, item.bloodGroup))) })) })] }), _jsxs(Card, { children: [_jsxs(CardHeader, { className: "bg-slate-50 border-b border-slate-100 flex-row items-center justify-between", children: [_jsx(CardTitle, { className: "text-sm font-semibold text-slate-800", children: "Active Blood Holds" }), _jsxs(Link, { to: "/hospital/reservations", className: "text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1", children: ["View All (", reservations.length, ")", _jsx(ArrowRight, { className: "w-3 h-3" })] })] }), _jsx(CardContent, { className: "p-0 divide-y divide-slate-100", children: isReservationsLoading ? (_jsx("div", { className: "py-8 flex justify-center", children: _jsx(Spinner, { size: "md", label: "Loading reservations..." }) })) : activeReservations.length === 0 ? (_jsx("div", { className: "p-6 text-center text-xs text-slate-500", children: "No active blood reservations at this time." })) : (activeReservations
-                                    .slice(0, 4)
-                                    .map((res) => (_jsxs("div", { className: "p-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors", children: [_jsxs("div", { className: "flex items-center gap-3", children: [_jsx("span", { className: "w-9 h-9 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold flex items-center justify-center", children: toDisplayBloodGroup(res.bloodGroup) }), _jsxs("div", { children: [_jsxs("p", { className: "text-xs font-semibold text-slate-900", children: [res.unitsReserved, ' ', res.unitsReserved === 1
-                                                                    ? 'unit'
-                                                                    : 'units', ' ', "\u2022 Request #", res.requestId] }), _jsxs("p", { className: "text-[11px] text-slate-500", children: ["Reserved on", ' ', formatDate(res.createdAt)] })] })] }), _jsx(StatusBadge, { status: res.status })] }, res.id)))) })] })] })] }));
+            'Portal'}`} description="Manage blood bank inventory, reserve units for patient requests, and record reservation fulfillment." action={<div className="flex items-center gap-2">
+          <Link to="/hospital/inventory">
+            <Button variant="outline" size="sm" leftIcon={<Package className="w-4 h-4"/>}>
+              Update Inventory
+            </Button>
+          </Link>
+
+          <Link to="/hospital/reservations">
+            <Button variant="primary" size="sm" leftIcon={<CalendarCheck className="w-4 h-4"/>}>
+              Manage Reservations (
+              {activeReservations.length})
+            </Button>
+          </Link>
+        </div>}>
+      <div className="p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${isVerified
+            ? 'bg-emerald-100 text-emerald-700'
+            : 'bg-amber-100 text-amber-700'}`}>
+            <ShieldCheck className="w-5 h-5"/>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-bold text-slate-900">
+                {profile?.hospitalName ||
+            'Medical Center'}
+              </h4>
+
+              {isVerified ? (<Badge variant="verified">
+                  Facility Verified
+                </Badge>) : (<Badge variant="pending">
+                  Pending Admin Verification
+                </Badge>)}
+            </div>
+
+            <p className="text-xs text-slate-500 mt-0.5">
+              Registration #
+              {profile?.registrationNumber ||
+            'Pending'}{' '}
+              •{' '}
+              {profile?.city
+            ? `${profile.city}, ${profile.state}`
+            : 'Location unconfigured'}
+            </p>
+          </div>
+        </div>
+
+        <Link to="/hospital/profile">
+          <Button variant="outline" size="sm">
+            View Facility Profile
+          </Button>
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white border-teal-100 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">
+                Available Stock
+              </p>
+
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">
+                {totalAvailable}{' '}
+                <span className="text-xs font-normal text-slate-500">
+                  units
+                </span>
+              </h3>
+            </div>
+
+            <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+              <Package className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-purple-100 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-purple-700">
+                Reserved Units
+              </p>
+
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">
+                {totalReserved}{' '}
+                <span className="text-xs font-normal text-slate-500">
+                  units
+                </span>
+              </h3>
+            </div>
+
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+              <Layers className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-sky-100 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-sky-700">
+                Active Holds
+              </p>
+
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">
+                {activeReservations.length}
+              </h3>
+            </div>
+
+            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+              <CalendarCheck className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-indigo-100 shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-indigo-700">
+                Total Reservations
+              </p>
+
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">
+                {reservations.length}
+              </h3>
+            </div>
+
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <Building2 className="w-5 h-5"/>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader className="bg-slate-50 border-b border-slate-100 flex-row items-center justify-between">
+            <CardTitle className="text-sm font-semibold text-slate-800">
+              Inventory Snapshot
+            </CardTitle>
+
+            <Link to="/hospital/inventory" className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1">
+              Full Inventory
+              <ArrowRight className="w-3 h-3"/>
+            </Link>
+          </CardHeader>
+
+          <CardContent className="p-4">
+            {isInventoryLoading ? (<div className="py-8 flex justify-center">
+                <Spinner size="md" label="Loading inventory..."/>
+              </div>) : inventory.length === 0 ? (<div className="p-6 text-center text-xs text-slate-500">
+                No inventory records found. Click
+                "Update Inventory" to populate stocks.
+              </div>) : (<div className="grid grid-cols-4 gap-2.5">
+                {inventory.map((item) => (<div key={item.bloodGroup} className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/60 text-center">
+                    <span className="text-xs font-extrabold text-rose-700 block">
+                      {toDisplayBloodGroup(item.bloodGroup)}
+                    </span>
+
+                    <span className="text-base font-bold text-slate-900 mt-0.5 block">
+                      {item.availableUnits}
+                    </span>
+
+                    <span className="text-[10px] text-slate-400 block">
+                      {item.reservedUnits} res
+                    </span>
+                  </div>))}
+              </div>)}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="bg-slate-50 border-b border-slate-100 flex-row items-center justify-between">
+            <CardTitle className="text-sm font-semibold text-slate-800">
+              Active Blood Holds
+            </CardTitle>
+
+            <Link to="/hospital/reservations" className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1">
+              View All ({reservations.length})
+              <ArrowRight className="w-3 h-3"/>
+            </Link>
+          </CardHeader>
+
+          <CardContent className="p-0 divide-y divide-slate-100">
+            {isReservationsLoading ? (<div className="py-8 flex justify-center">
+                <Spinner size="md" label="Loading reservations..."/>
+              </div>) : activeReservations.length === 0 ? (<div className="p-6 text-center text-xs text-slate-500">
+                No active blood reservations at this time.
+              </div>) : (activeReservations
+            .slice(0, 4)
+            .map((res) => (<div key={res.id} className="p-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <span className="w-9 h-9 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold flex items-center justify-center">
+                        {toDisplayBloodGroup(res.bloodGroup)}
+                      </span>
+
+                      <div>
+                        <p className="text-xs font-semibold text-slate-900">
+                          {res.unitsReserved}{' '}
+                          {res.unitsReserved === 1
+                ? 'unit'
+                : 'units'}{' '}
+                          • Request #
+                          {res.bloodRequestId}
+                        </p>
+
+                        <p className="text-[11px] text-slate-500">
+                          Reserved on{' '}
+                          {formatDate(res.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <StatusBadge status={res.status}/>
+                  </div>)))}
+          </CardContent>
+        </Card>
+      </div>
+    </PageContainer>);
 }

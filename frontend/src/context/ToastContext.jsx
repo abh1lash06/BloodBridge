@@ -1,4 +1,3 @@
-import { jsx as _jsx } from "react/jsx-runtime";
 import React, { createContext, useContext, useState, useCallback } from 'react';
 const ToastContext = createContext(undefined);
 export function ToastProvider({ children }) {
@@ -19,7 +18,9 @@ export function ToastProvider({ children }) {
     const error = useCallback((message, title) => addToast({ type: 'error', message, title: title || 'Error' }), [addToast]);
     const info = useCallback((message, title) => addToast({ type: 'info', message, title }), [addToast]);
     const warning = useCallback((message, title) => addToast({ type: 'warning', message, title }), [addToast]);
-    return (_jsx(ToastContext.Provider, { value: { toasts, addToast, removeToast, success, error, info, warning }, children: children }));
+    return (<ToastContext.Provider value={{ toasts, addToast, removeToast, success, error, info, warning }}>
+      {children}
+    </ToastContext.Provider>);
 }
 export function useToast() {
     const context = useContext(ToastContext);

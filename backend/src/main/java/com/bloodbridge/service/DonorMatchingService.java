@@ -163,49 +163,83 @@ public class DonorMatchingService {
          * Create a pending match for every eligible donor
          * who has not already been matched to this request.
          */
-        donors.getContent().forEach(donorProfile -> {
-
-            boolean alreadyMatched =
-                    bloodRequestMatchRepository
-                            .existsByBloodRequestIdAndDonorProfileId(
-                                    bloodRequest.getId(),
-                                    donorProfile.getId()
-                            );
-
-            if (alreadyMatched) {
-                return;
-            }
-
-            BloodRequestMatch match =
-                    BloodRequestMatch.builder()
-                            .bloodRequest(bloodRequest)
-                            .donorProfile(donorProfile)
-                            .status(
-                                    BloodRequestMatch.MatchStatus.PENDING
-                            )
-                            .build();
-
-            bloodRequestMatchRepository.save(match);
-
-            /*
-             * Notify the donor that a new blood request
-             * is available for them.
-             */
-            notificationService.createNotification(
-                    donorProfile.getUser(),
-                    Notification.NotificationType.DONOR_MATCHED,
-                    "New Blood Donation Request",
-                    "You have been matched with a blood request for "
-                            + formatBloodGroup(
-                                    bloodRequest.getBloodGroup()
-                            )
-                            + " blood at "
-                            + bloodRequest.getHospitalName(),
-                    bloodRequest.getId()
-            );
-        });
+        donors.getContent().forEach(donorProfile ->
+                createPendingMatch(bloodRequest, donorProfile));
 
         return donors.map(this::toResponse);
+    }
+
+    /** Notify each currently eligible donor when a patient publishes a new request. */
+    @Transactional
+    public void matchNewRequest(BloodRequest bloodRequest) {
+        if (bloodRequest.getStatus() != BloodRequest.Status.OPEN) return;
+        DonorProfile.BloodGroup group = convertBloodGroup(bloodRequest.getBloodGroup());
+        int page = 0;
+        Page<DonorProfile> donors;
+        do {
+            donors = donorProfileRepository.findByBloodGroupAndAvailableTrueAndVerificationStatus(
+                    group, DonorProfile.VerificationStatus.VERIFIED, PageRequest.of(page++, 50));
+            donors.getContent().forEach(donor -> createPendingMatch(bloodRequest, donor));
+        } while (donors.hasNext());
+    }
+
+    /** Previously published requests should also reach newly verified donors. */
+    @Transactional
+    public void matchOpenRequestsForDonor(DonorProfile donor) {
+        if (!Boolean.TRUE.equals(donor.getAvailable()) ||
+                donor.getVerificationStatus() != DonorProfile.VerificationStatus.VERIFIED) return;
+        BloodRequest.BloodGroup group = BloodRequest.BloodGroup.valueOf(donor.getBloodGroup().name());
+        int page = 0;
+        Page<BloodRequest> requests;
+        do {
+            requests = bloodRequestRepository.findByStatusAndBloodGroup(
+                    BloodRequest.Status.OPEN, group, PageRequest.of(page++, 50));
+            requests.getContent().forEach(request -> createPendingMatch(request, donor));
+        } while (requests.hasNext());
+    }
+
+    private void createPendingMatch(BloodRequest request, DonorProfile donor) {
+        if (bloodRequestMatchRepository.existsByBloodRequestIdAndDonorProfileId(
+                request.getId(), donor.getId())) return;
+        BloodRequestMatch match = BloodRequestMatch.builder()
+                .bloodRequest(request).donorProfile(donor)
+                .status(BloodRequestMatch.MatchStatus.PENDING).build();
+        bloodRequestMatchRepository.save(match);
+        notificationService.createNotification(
+                donor.getUser(), Notification.NotificationType.DONOR_MATCHED,
+                "New Blood Donation Request",
+                "You have been matched with a blood request for " +
+                        formatBloodGroup(request.getBloodGroup()) + " blood at " + request.getHospitalName(),
+                request.getId());
+    }
+
+    @Transactional
+    public void cancelPendingMatches(Long requestId) {
+        List<BloodRequestMatch> pending = bloodRequestMatchRepository.findByBloodRequestIdAndStatus(
+                requestId, BloodRequestMatch.MatchStatus.PENDING);
+        for (BloodRequestMatch match : pending) {
+            match.setStatus(BloodRequestMatch.MatchStatus.CANCELLED);
+            match.setRespondedAt(LocalDateTime.now());
+        }
+        bloodRequestMatchRepository.saveAll(pending);
+    }
+
+    @Transactional
+    public void cancelAllMatchesForRequest(Long requestId) {
+        for (BloodRequestMatch.MatchStatus status : new BloodRequestMatch.MatchStatus[] {
+                BloodRequestMatch.MatchStatus.PENDING, BloodRequestMatch.MatchStatus.ACCEPTED
+        }) {
+            List<BloodRequestMatch> active = bloodRequestMatchRepository
+                    .findByBloodRequestIdAndStatus(requestId, status);
+            for (BloodRequestMatch match : active) {
+                match.setStatus(BloodRequestMatch.MatchStatus.CANCELLED);
+                match.setRespondedAt(LocalDateTime.now());
+                notificationService.createNotification(match.getDonorProfile().getUser(),
+                        Notification.NotificationType.REQUEST_CANCELLED,
+                        "Blood Request Cancelled", "The patient has cancelled the blood request.", requestId);
+            }
+            bloodRequestMatchRepository.saveAll(active);
+        }
     }
 
     // =========================================================
@@ -276,8 +310,8 @@ public class DonorMatchingService {
             );
         }
 
-        BloodRequest request =
-                match.getBloodRequest();
+        BloodRequest request = bloodRequestRepository.findForUpdate(match.getBloodRequest().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Blood request not found"));
 
         if (request.getStatus() !=
                 BloodRequest.Status.OPEN) {
@@ -285,6 +319,12 @@ public class DonorMatchingService {
             throw new IllegalArgumentException(
                     "Only matches for open blood requests can be accepted"
             );
+        }
+
+        DonorProfile profile = match.getDonorProfile();
+        if (!Boolean.TRUE.equals(profile.getAvailable()) ||
+                profile.getVerificationStatus() != DonorProfile.VerificationStatus.VERIFIED) {
+            throw new IllegalArgumentException("Donor must be available and verified before accepting");
         }
 
         // -----------------------------------------------------
@@ -301,15 +341,15 @@ public class DonorMatchingService {
 
         bloodRequestMatchRepository.save(match);
 
-        // -----------------------------------------------------
-        // Change request status from OPEN to MATCHED
-        // -----------------------------------------------------
-
-        request.setStatus(
-                BloodRequest.Status.MATCHED
-        );
-
-        bloodRequestRepository.save(request);
+        // A donor acceptance accounts for one unit. Keep the request OPEN until
+        // enough donors accept for its requested quantity.
+        long accepted = bloodRequestMatchRepository.countByBloodRequestIdAndStatus(
+                request.getId(), BloodRequestMatch.MatchStatus.ACCEPTED);
+        boolean fullyMatched = accepted >= request.getUnitsRequired();
+        if (fullyMatched) {
+            request.setStatus(BloodRequest.Status.MATCHED);
+            bloodRequestRepository.save(request);
+        }
 
         // -----------------------------------------------------
         // Notify the patient
@@ -327,6 +367,8 @@ public class DonorMatchingService {
         // -----------------------------------------------------
         // Cancel all other pending matches
         // -----------------------------------------------------
+
+        if (!fullyMatched) return;
 
         List<BloodRequestMatch> otherPendingMatches =
                 bloodRequestMatchRepository

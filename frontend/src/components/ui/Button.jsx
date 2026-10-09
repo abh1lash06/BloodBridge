@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
@@ -17,6 +16,10 @@ export const Button = React.forwardRef(({ className, variant = 'primary', size =
         md: 'text-sm px-4 py-2 gap-2',
         lg: 'text-base px-5 py-2.5 gap-2.5',
     };
-    return (_jsxs("button", { ref: ref, disabled: disabled || isLoading, className: cn(baseStyles, variants[variant], sizes[size], className), ...props, children: [isLoading ? (_jsx(Loader2, { className: "w-4 h-4 animate-spin shrink-0" })) : (leftIcon && _jsx("span", { className: "shrink-0", children: leftIcon })), _jsx("span", { children: children }), !isLoading && rightIcon && _jsx("span", { className: "shrink-0", children: rightIcon })] }));
+    return (<button ref={ref} disabled={disabled || isLoading} className={cn(baseStyles, variants[variant], sizes[size], className)} {...props}>
+        {isLoading ? (<Loader2 className="w-4 h-4 animate-spin shrink-0"/>) : (leftIcon && <span className="shrink-0">{leftIcon}</span>)}
+        <span>{children}</span>
+        {!isLoading && rightIcon && <span className="shrink-0">{rightIcon}</span>}
+      </button>);
 });
 Button.displayName = 'Button';

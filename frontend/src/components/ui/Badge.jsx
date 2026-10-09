@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Clock, XCircle, AlertTriangle, Flame, Check, ShieldCheck, Ban, PackageCheck, RotateCcw, } from 'lucide-react';
@@ -8,31 +7,31 @@ export function Badge({ className, variant = 'default', size = 'md', icon = true
             return null;
         switch (variant) {
             case 'open':
-                return _jsx(Clock, { className: "w-3 h-3 text-sky-600", "aria-hidden": "true" });
+                return <Clock className="w-3 h-3 text-sky-600" aria-hidden="true"/>;
             case 'matched':
-                return _jsx(CheckCircle2, { className: "w-3 h-3 text-indigo-600", "aria-hidden": "true" });
+                return <CheckCircle2 className="w-3 h-3 text-indigo-600" aria-hidden="true"/>;
             case 'fulfilled':
-                return _jsx(PackageCheck, { className: "w-3 h-3 text-emerald-600", "aria-hidden": "true" });
+                return <PackageCheck className="w-3 h-3 text-emerald-600" aria-hidden="true"/>;
             case 'cancelled':
-                return _jsx(XCircle, { className: "w-3 h-3 text-slate-500", "aria-hidden": "true" });
+                return <XCircle className="w-3 h-3 text-slate-500" aria-hidden="true"/>;
             case 'pending':
-                return _jsx(Clock, { className: "w-3 h-3 text-amber-600", "aria-hidden": "true" });
+                return <Clock className="w-3 h-3 text-amber-600" aria-hidden="true"/>;
             case 'accepted':
-                return _jsx(Check, { className: "w-3 h-3 text-emerald-600", "aria-hidden": "true" });
+                return <Check className="w-3 h-3 text-emerald-600" aria-hidden="true"/>;
             case 'rejected':
-                return _jsx(Ban, { className: "w-3 h-3 text-rose-600", "aria-hidden": "true" });
+                return <Ban className="w-3 h-3 text-rose-600" aria-hidden="true"/>;
             case 'reserved':
-                return _jsx(Clock, { className: "w-3 h-3 text-purple-600", "aria-hidden": "true" });
+                return <Clock className="w-3 h-3 text-purple-600" aria-hidden="true"/>;
             case 'released':
-                return _jsx(RotateCcw, { className: "w-3 h-3 text-slate-600", "aria-hidden": "true" });
+                return <RotateCcw className="w-3 h-3 text-slate-600" aria-hidden="true"/>;
             case 'verified':
-                return _jsx(ShieldCheck, { className: "w-3 h-3 text-emerald-600", "aria-hidden": "true" });
+                return <ShieldCheck className="w-3 h-3 text-emerald-600" aria-hidden="true"/>;
             case 'normal':
                 return null;
             case 'urgent':
-                return _jsx(AlertTriangle, { className: "w-3 h-3 text-amber-600", "aria-hidden": "true" });
+                return <AlertTriangle className="w-3 h-3 text-amber-600" aria-hidden="true"/>;
             case 'critical':
-                return _jsx(Flame, { className: "w-3 h-3 text-rose-600", "aria-hidden": "true" });
+                return <Flame className="w-3 h-3 text-rose-600" aria-hidden="true"/>;
             default:
                 return null;
         }
@@ -57,38 +56,41 @@ export function Badge({ className, variant = 'default', size = 'md', icon = true
         sm: 'text-[11px] px-2 py-0.5 gap-1',
         md: 'text-xs px-2.5 py-1 gap-1.5',
     };
-    return (_jsxs("span", { className: cn('inline-flex items-center font-medium rounded-full border shrink-0', variantStyles[variant], sizeStyles[size], className), ...props, children: [getIcon(), _jsx("span", { children: children })] }));
+    return (<span className={cn('inline-flex items-center font-medium rounded-full border shrink-0', variantStyles[variant], sizeStyles[size], className)} {...props}>
+      {getIcon()}
+      <span>{children}</span>
+    </span>);
 }
 export function StatusBadge({ status }) {
     const norm = status?.toUpperCase();
     switch (norm) {
         case 'OPEN':
-            return _jsx(Badge, { variant: "open", children: "Open" });
+            return <Badge variant="open">Open</Badge>;
         case 'MATCHED':
-            return _jsx(Badge, { variant: "matched", children: "Matched" });
+            return <Badge variant="matched">Matched</Badge>;
         case 'FULFILLED':
-            return _jsx(Badge, { variant: "fulfilled", children: "Fulfilled" });
+            return <Badge variant="fulfilled">Fulfilled</Badge>;
         case 'CANCELLED':
-            return _jsx(Badge, { variant: "cancelled", children: "Cancelled" });
+            return <Badge variant="cancelled">Cancelled</Badge>;
         case 'PENDING':
-            return _jsx(Badge, { variant: "pending", children: "Pending" });
+            return <Badge variant="pending">Pending</Badge>;
         case 'ACCEPTED':
-            return _jsx(Badge, { variant: "accepted", children: "Accepted" });
+            return <Badge variant="accepted">Accepted</Badge>;
         case 'REJECTED':
-            return _jsx(Badge, { variant: "rejected", children: "Rejected" });
+            return <Badge variant="rejected">Rejected</Badge>;
         case 'RESERVED':
-            return _jsx(Badge, { variant: "reserved", children: "Reserved" });
+            return <Badge variant="reserved">Reserved</Badge>;
         case 'RELEASED':
-            return _jsx(Badge, { variant: "released", children: "Released" });
+            return <Badge variant="released">Released</Badge>;
         case 'VERIFIED':
-            return _jsx(Badge, { variant: "verified", children: "Verified" });
+            return <Badge variant="verified">Verified</Badge>;
         case 'CRITICAL':
-            return _jsx(Badge, { variant: "critical", children: "CRITICAL" });
+            return <Badge variant="critical">CRITICAL</Badge>;
         case 'URGENT':
-            return _jsx(Badge, { variant: "urgent", children: "URGENT" });
+            return <Badge variant="urgent">URGENT</Badge>;
         case 'NORMAL':
-            return _jsx(Badge, { variant: "normal", children: "Normal" });
+            return <Badge variant="normal">Normal</Badge>;
         default:
-            return _jsx(Badge, { variant: "default", children: status });
+            return <Badge variant="default">{status}</Badge>;
     }
 }

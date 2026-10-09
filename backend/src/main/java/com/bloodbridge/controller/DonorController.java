@@ -4,6 +4,7 @@ import com.bloodbridge.dto.donor.CreateDonorProfileRequest;
 import com.bloodbridge.dto.donor.DonorProfileResponse;
 import com.bloodbridge.dto.donor.DonorSearchResponse;
 import com.bloodbridge.dto.donor.UpdateAvailabilityRequest;
+import com.bloodbridge.dto.donor.UpdateDonorProfileRequest;
 import com.bloodbridge.service.DonorService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -12,13 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/donors")
@@ -58,6 +53,20 @@ public class DonorController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/profile")
+    public ResponseEntity<DonorProfileResponse> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody UpdateDonorProfileRequest request) {
+
+        DonorProfileResponse response =
+                donorService.updateProfile(
+                        authentication.getName(),
+                        request
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/profile/availability")
     public ResponseEntity<DonorProfileResponse> updateAvailability(
             Authentication authentication,
@@ -90,7 +99,8 @@ public class DonorController {
             );
         }
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable =
+                PageRequest.of(page, size);
 
         Page<DonorSearchResponse> response =
                 donorService.searchDonors(

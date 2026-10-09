@@ -1,8 +1,10 @@
 import { z } from 'zod';
+
 export const loginSchema = z.object({
     email: z.string().trim().email('Please enter a valid email address'),
     password: z.string().min(1, 'Password is required'),
 });
+
 export const registerSchema = z.object({
     fullName: z.string().trim().min(2, 'Full name must be at least 2 characters'),
     email: z.string().trim().email('Please enter a valid email address'),
@@ -14,6 +16,7 @@ export const registerSchema = z.object({
     }),
     phoneNumber: z.string().trim().optional(),
 });
+
 export const patientRequestSchema = z.object({
     bloodGroup: z.string().min(1, 'Please select a blood group'),
     unitsRequired: z
@@ -29,12 +32,21 @@ export const patientRequestSchema = z.object({
     requiredDate: z.string().min(1, 'Required date is required'),
     additionalNotes: z.string().trim().optional(),
 });
+
 export const donorProfileSchema = z.object({
     bloodGroup: z.string().min(1, 'Please select a blood group'),
     dateOfBirth: z.string().min(1, 'Date of birth is required'),
     gender: z.string().min(1, 'Gender is required'),
     address: z.string().trim().min(3, 'Address is required'),
 });
+
+export const donorProfileUpdateSchema = z.object({
+    bloodGroup: z.string().min(1, 'Please select a blood group'),
+    dateOfBirth: z.string().min(1, 'Date of birth is required'),
+    gender: z.string().min(1, 'Gender is required'),
+    address: z.string().trim().min(3, 'Address is required'),
+});
+
 export const hospitalProfileSchema = z.object({
     hospitalName: z.string().trim().min(2, 'Hospital name is required'),
     registrationNumber: z.string().trim().min(2, 'Registration number is required'),
@@ -43,12 +55,14 @@ export const hospitalProfileSchema = z.object({
     state: z.string().trim().min(2, 'State is required'),
     phone: z.string().trim().min(5, 'Contact phone number is required'),
 });
+
 export const hospitalReserveSchema = z.object({
     units: z
         .number({ error: 'Units must be a number' })
         .int('Units must be a whole number')
         .min(1, 'At least 1 unit must be reserved'),
 });
+
 export const updateInventorySchema = z.object({
     bloodGroup: z.string().min(1, 'Blood group is required'),
     availableUnits: z

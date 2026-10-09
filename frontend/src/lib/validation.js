@@ -68,7 +68,6 @@ export const donorProfileUpdateSchema = donorProfileSchema.omit({
   bloodGroup: true,
 });
 
-export const donorProfileUpdateSchema = donorProfileSchema.omit({ bloodGroup: true });
 
 export const hospitalProfileSchema = z.object({
   hospitalName: z.string().trim().min(2, 'Hospital name is required'),

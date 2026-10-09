@@ -74,6 +74,27 @@ public class DonorService {
         return toResponse(saved);
     }
 
+    @Transactional
+    public DonorProfileResponse updateProfile(
+            String authenticatedEmail,
+            CreateDonorProfileRequest request) {
+        User user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user.getRole() != User.Role.DONOR) {
+            throw new IllegalArgumentException("Only donor accounts can update donor profiles");
+        }
+        DonorProfile profile = donorProfileRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Donor profile not found"));
+        DonorProfile.BloodGroup requestedBloodGroup = parseBloodGroup(request.getBloodGroup());
+        if (requestedBloodGroup != profile.getBloodGroup()) {
+            throw new IllegalArgumentException("Blood group cannot be changed after registration");
+        }
+        profile.setDateOfBirth(request.getDateOfBirth());
+        profile.setGender(parseGender(request.getGender()));
+        profile.setAddress(request.getAddress().trim());
+        return toResponse(donorProfileRepository.save(profile));
+    }
+
     // =========================================================
     // GET MY DONOR PROFILE
     // =========================================================

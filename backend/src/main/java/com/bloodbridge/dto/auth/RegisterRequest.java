@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Past;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,4 +46,14 @@ public class RegisterRequest {
 
     @NotNull(message = "Role is required")
     private User.Role role;
+    // Extra details for donor registrations.
+    private String bloodGroup;
+
+    @Past(message = "Date of birth must be in the past")
+    private LocalDate dateOfBirth;
+
+    private String gender;
+
+    @Size(max = 500, message = "Address must not exceed 500 characters")
+    private String address;
 }

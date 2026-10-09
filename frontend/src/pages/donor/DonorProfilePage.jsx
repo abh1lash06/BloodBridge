@@ -27,18 +27,18 @@ export function DonorProfilePage() {
     const { register, handleSubmit, reset, formState: { errors, isSubmitting }, } = useForm({
         resolver: zodResolver(donorProfileSchema),
         defaultValues: {
-            bloodGroup: 'O+',
-            dateOfBirth: '1995-01-01',
-            gender: 'MALE',
+            bloodGroup: '',
+            dateOfBirth: '',
+            gender: '',
             address: '',
         },
     });
     useEffect(() => {
         if (profile) {
             reset({
-                bloodGroup: toDisplayBloodGroup(profile.bloodGroup) || 'O+',
-                dateOfBirth: profile.dateOfBirth?.split('T')[0] || '1995-01-01',
-                gender: profile.gender || 'MALE',
+                bloodGroup: toDisplayBloodGroup(profile.bloodGroup) || '',
+                dateOfBirth: profile.dateOfBirth?.split('T')[0] || '',
+                gender: profile.gender || '',
                 address: profile.address || '',
             });
         }
@@ -68,7 +68,7 @@ export function DonorProfilePage() {
         setServerError(null);
         saveMutation.mutate(data);
     };
-    const isAvailable = profile?.isAvailable ?? true;
+    const isAvailable = profile?.available ?? false;
     return (_jsx(PageContainer, { title: "Donor Medical Profile", description: "Maintain your blood donation eligibility, clinical details, and real-time availability.", children: isLoading ? (_jsx("div", { className: "py-20 flex justify-center", children: _jsx(Spinner, { size: "lg", label: "Loading donor profile..." }) })) : isError ? (_jsx(ErrorState, { title: "Could not load profile", message: "Failed to retrieve donor profile details from backend.", onRetry: () => refetch() })) : (_jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [_jsx("div", { className: "space-y-6", children: _jsxs(Card, { children: [_jsx(CardHeader, { className: "bg-slate-50 border-b border-slate-100", children: _jsx(CardTitle, { className: "text-sm font-semibold text-slate-800", children: "Verification & Status" }) }), _jsxs(CardContent, { className: "p-5 space-y-4", children: [_jsxs("div", { children: [_jsx("span", { className: "text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1", children: "Medical Verification" }), _jsx("div", { className: "flex items-center gap-2", children: _jsx(StatusBadge, { status: profile?.verificationStatus || 'PENDING' }) }), _jsx("p", { className: "text-xs text-slate-500 mt-2 leading-relaxed", children: profile?.verificationStatus === 'VERIFIED'
                                                     ? 'Your donor profile is medically verified by administrator.'
                                                     : profile?.verificationStatus === 'REJECTED'

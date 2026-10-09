@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +45,13 @@ public class DonorController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<DonorProfileResponse> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody CreateDonorProfileRequest request) {
+        return ResponseEntity.ok(donorService.updateProfile(authentication.getName(), request));
     }
 
     @GetMapping("/profile")

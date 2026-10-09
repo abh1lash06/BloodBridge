@@ -106,7 +106,7 @@ export function formatDateTime(dateString) {
 export function getApiErrorMessage(error) {
     if (axios.isAxiosError(error)) {
         if (!error.response) {
-            return 'Cannot connect to BloodBridge server at http://localhost:8080. Please ensure the backend is running.';
+            return 'Cannot connect to BloodBridge API. Check the deployed Railway backend and connection.';
         }
         const status = error.response.status;
         const data = error.response.data;
@@ -115,6 +115,7 @@ export function getApiErrorMessage(error) {
             return data;
         }
         if (data && typeof data === 'object') {
+            if (data.errors && typeof data.errors === 'object') { const detail = Object.values(data.errors).find(x => typeof x === 'string' && x); if (detail) return detail; }
             if ('message' in data && typeof data.message === 'string' && data.message) {
                 return data.message;
             }

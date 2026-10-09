@@ -6,49 +6,36 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
 export const registerSchema = z.object({
-  fullName: z.string().trim().min(2, 'Full name must be at least 2 characters'),
-  email: z.string().trim().email('Please enter a valid email address'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(72, 'Password must not exceed 72 characters'),
-  role: z.enum(['PATIENT', 'DONOR'], {
-    error: 'Please select a valid role',
-  }),
-  phone: z.string().trim().max(20, 'Phone must not exceed 20 characters').optional(),
-  bloodGroup: z.string().optional(),
-  dateOfBirth: z.string().optional(),
-  gender: z.string().optional(),
-  address: z.string().trim().max(500).optional(),
+    fullName: z.string().trim().min(2, 'Full name must be at least 2 characters'),
+    email: z.string().trim().email('Please enter a valid email'),
+    password: z.string().min(8, 'Password must be at least 8 characters').max(72),
+    role: z.enum(['PATIENT', 'DONOR']),
+    phoneNumber: z.string().trim().max(20).optional(),
+    bloodGroup: z.string().optional(),
+    dateOfBirth: z.string().optional(),
+    gender: z.string().optional(),
+    address: z.string().trim().max(500).optional(),
 }).superRefine((data, ctx) => {
-  if (data.role !== 'DONOR') return;
-
-  for (const field of ['bloodGroup', 'dateOfBirth', 'gender', 'address']) {
-    if (!data[field]?.trim()) {
-      ctx.addIssue({
-        code: 'custom',
-        path: [field],
-        message: `${field} is required for donor registration`,
-      });
+    if (data.role !== 'DONOR') return;
+    if (!bloodGroups.includes(data.bloodGroup || '')) {
+        ctx.addIssue({ code: 'custom', path: ['bloodGroup'], message: 'Select a valid blood group' });
     }
-  }
-
-  if (
-    data.dateOfBirth &&
-    (
-      !/^\d{4}-\d{2}-\d{2}$/.test(data.dateOfBirth) ||
-      Number.isNaN(Date.parse(data.dateOfBirth)) ||
-      data.dateOfBirth >= new Date().toISOString().slice(0, 10)
-    )
-  ) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['dateOfBirth'],
-      message: 'Enter a valid past date of birth',
-    });
-  }
+    const dob = data.dateOfBirth || '';
+    const parsedDate = new Date(dob + 'T00:00:00');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== dob || parsedDate >= new Date()) {
+        ctx.addIssue({ code: 'custom', path: ['dateOfBirth'], message: 'Enter a valid past date of birth' });
+    }
+    if (!['MALE', 'FEMALE', 'OTHER'].includes(data.gender || '')) {
+        ctx.addIssue({ code: 'custom', path: ['gender'], message: 'Select gender' });
+    }
+    if (!data.address || data.address.trim().length < 3) {
+        ctx.addIssue({ code: 'custom', path: ['address'], message: 'Address must have at least 3 characters' });
+    }
 });
+
 
 export const patientRequestSchema = z.object({
   bloodGroup: z.string().min(1, 'Please select a blood group'),
@@ -80,6 +67,8 @@ export const donorProfileSchema = z.object({
 export const donorProfileUpdateSchema = donorProfileSchema.omit({
   bloodGroup: true,
 });
+
+export const donorProfileUpdateSchema = donorProfileSchema.omit({ bloodGroup: true });
 
 export const hospitalProfileSchema = z.object({
   hospitalName: z.string().trim().min(2, 'Hospital name is required'),

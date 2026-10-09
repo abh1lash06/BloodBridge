@@ -106,7 +106,9 @@ export function formatDateTime(dateString) {
 export function getApiErrorMessage(error) {
     if (axios.isAxiosError(error)) {
         if (!error.response) {
-            return 'Cannot connect to BloodBridge server at http://localhost:8080. Please ensure the backend is running.';
+            
+return `Cannot connect to BloodBridge server at ${error.config?.baseURL || import.meta.env.VITE_API_BASE_URL || 'the configured API server'}. Please check the connection.`;
+
         }
         const status = error.response.status;
         const data = error.response.data;

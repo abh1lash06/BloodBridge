@@ -28,7 +28,7 @@ export async function getDonorProfile() {
     return response.data;
 }
 export async function saveDonorProfile(data) {
-    const response = await apiClient.post('/api/donors/profile', data);
+    const response = await apiClient.put('/api/donors/profile', data);
     return response.data;
 }
 export async function createDonorProfile(data) {

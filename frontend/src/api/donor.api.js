@@ -1,8 +1,28 @@
 import apiClient from './client';
 
+function isMissingDonorProfile(error) {
+    return error?.response?.status === 400 &&
+        /donor profile not found/i.test(error?.response?.data?.message ?? '');
+}
+
 export async function getDonorProfile() {
-    const response = await apiClient.get('/api/donors/profile');
-    return response.data;
+    try {
+        const response = await apiClient.get('/api/donors/profile');
+        return response.data;
+    } catch (error) {
+        if (isMissingDonorProfile(error)) {
+            return {
+                needsCreation: true,
+                bloodGroup: null,
+                dateOfBirth: null,
+                gender: null,
+                address: '',
+                available: false,
+                verificationStatus: 'PENDING',
+            };
+        }
+        throw error;
+    }
 }
 
 export async function createDonorProfile(data) {
@@ -15,7 +35,16 @@ export async function updateDonorProfile(data) {
     return response.data;
 }
 
-export const saveDonorProfile = updateDonorProfile;
+export async function saveDonorProfile(data) {
+    try {
+        return await updateDonorProfile(data);
+    } catch (error) {
+        if (isMissingDonorProfile(error)) {
+            return createDonorProfile(data);
+        }
+        throw error;
+    }
+}
 
 export async function updateDonorAvailability(available) {
     const response = await apiClient.patch('/api/donors/profile/availability', {

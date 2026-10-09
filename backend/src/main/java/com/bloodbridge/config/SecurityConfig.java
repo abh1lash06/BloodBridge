@@ -53,10 +53,11 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
+        configuration.setAllowedOriginPatterns(
                 List.of(
                         "http://localhost:3000",
-                        "https://blood-bridge-delta-six.vercel.app"
+                        "https://blood-bridge.vercel.app",
+                        "https://blood-bridge-*.vercel.app"
                 )
         );
 
